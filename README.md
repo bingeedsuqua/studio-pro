@@ -1,20 +1,33 @@
-# Studio Pro
+name: Extract Studio Pro
 
-Application web autonome d'édition audiovisuelle.
+"on":
+  push:
+    paths:
+      - "studio_pro_v11.zip"
+  workflow_dispatch:
 
-## Lancer
-Ouvrir `index.html` dans un navigateur moderne (Chrome, Edge, Safari récent).
+permissions:
+  contents: write
 
-## Fonctions incluses
-- import vidéo/audio/images
-- prévisualisation vidéo
-- lecture, pause, navigation et volume
-- timeline vidéo/audio/texte
-- ajout de titres
-- cadrage 16:9, 9:16, 1:1 et 4:5
-- zoom, opacité et vitesse
-- sauvegarde d'un projet en JSON
-- export vidéo WebM via MediaRecorder
+jobs:
+  extract:
+    runs-on: ubuntu-latest
 
-## Limitation de la version autonome
-L'export navigateur produit un WebM de la prévisualisation. Un moteur de rendu serveur/FFmpeg pourra être ajouté pour les exports MP4 professionnels, les coupes physiques et le mixage multipiste complet.
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract Studio Pro
+        run: |
+          unzip -o studio_pro_v11.zip -d extracted
+          cp -r extracted/studio_pro_v9_src/* .
+          rm -rf extracted
+          rm -f studio_pro_v11.zip
+
+      - name: Commit files
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add .
+          git commit -m "Extract Studio Pro"
+          git push
